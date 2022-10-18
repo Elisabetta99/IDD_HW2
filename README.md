@@ -1,3 +1,1 @@
-# lucenex
-
-A few Lucene examples 
+# Homework 2 - Ingegneria Dei Dati
