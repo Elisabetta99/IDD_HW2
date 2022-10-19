@@ -39,15 +39,13 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.suggest.analyzing.SuggestStopFilterFactory;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.junit.Before;
-import org.junit.Test;
+
 
 public class Homework1 {
 	private ArrayList<File> queue;
 	private IndexWriter writer;
 	private String docPath;
-	
-	@Before 
+	 
 	public void setup() {
 		queue = new ArrayList<File>();
 		docPath = "target/docs";
@@ -55,7 +53,7 @@ public class Homework1 {
 
 	private void addFiles(File file) {
 		if (!file.exists()) {
-			System.out.println(file + "Does not exist");
+			System.out.println(file + "\nNon esisite");
 		}
 		if (file.isDirectory()) {
 			for (File f : file.listFiles()) {
@@ -67,7 +65,7 @@ public class Homework1 {
 			if (filename.endsWith(".txt")) {
 				queue.add(file);
 			} else {
-				System.out.println("Skipped: " + filename);
+				System.out.println("Ometti: " + filename);
 			}
 		}
 	}
@@ -136,5 +134,49 @@ public class Homework1 {
 		writer.close();
 	}
 
-	
+	public void testQuery() throws Exception {
+		Path path = Paths.get("target/index");
+
+		try (Directory directory = FSDirectory.open(path)) {
+			indexDocs(docPath, directory, null);
+			Scanner scan = new Scanner(System.in);
+			System.out.println("Eseguire la query su titolo o contenuto?\n");
+			String campo = scan.next();
+			System.out.println("Query:");
+			String parametro = scan.next();
+			QueryParser parser;
+			
+			if(campo.equals("contenuto")) {	
+				parser = new QueryParser("contenuto", new StandardAnalyzer());}
+			else {
+				parser = new QueryParser("titolo", new StandardAnalyzer());}
+			Query queryContenuto = parser.parse(parametro);
+
+			try (IndexReader reader = DirectoryReader.open(directory)) {
+				IndexSearcher searcher = new IndexSearcher(reader);
+				runQuery(searcher, queryContenuto);
+			} finally {
+				directory.close();
+			}
+
+		}
+	}
+
+	private void runQuery(IndexSearcher searcher, Query query) throws IOException {
+		runQuery(searcher, query, false);
+	}
+
+	private void runQuery(IndexSearcher searcher, Query query, boolean explain) throws IOException {
+		TopDocs hits = searcher.search(query, 10);
+		System.out.println("Risultati: ");
+		for (int i = 0; i < hits.scoreDocs.length; i++) {
+			ScoreDoc scoreDoc = hits.scoreDocs[i];
+			Document doc = searcher.doc(scoreDoc.doc);
+			System.out.println("doc"+scoreDoc.doc + ":"+ doc.get("titolo") + " (" + scoreDoc.score +")");
+			if (explain) {
+				Explanation explanation = searcher.explain(query, scoreDoc.doc);
+				System.out.println(explanation);
+			}
+		}
+	}
 }
