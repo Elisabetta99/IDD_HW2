@@ -14,13 +14,10 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 import org.apache.lucene.analysis.custom.CustomAnalyzer;
-import org.apache.lucene.analysis.en.EnglishMinimalStemFilterFactory;
-import org.apache.lucene.analysis.en.EnglishPossessiveFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.HyphenatedWordsFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.miscellaneous.TrimFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.WordDelimiterGraphFilterFactory;
-import org.apache.lucene.analysis.pattern.PatternReplaceCharFilterFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.document.Document;
@@ -47,7 +44,7 @@ public class Homework2 {
 	private ArrayList<File> queue;
 	private IndexWriter writer;
 	private String docPath;
-	
+
 	@Before
 	public void setup() {
 		queue = new ArrayList<File>();
@@ -76,7 +73,7 @@ public class Homework2 {
 
 	private void indexDocs(String fileName, Directory directory, Codec codec) throws IOException {
 		long timeIndexing1 = System.currentTimeMillis();
-		
+
 		/* Content analyzer */
 		Analyzer contentAnalyzer = CustomAnalyzer.builder()
 				.withTokenizer(WhitespaceTokenizerFactory.class)
@@ -98,9 +95,9 @@ public class Homework2 {
 		Map<String, Analyzer> perFieldAnalyzers = new HashMap<>();
 		perFieldAnalyzers.put("titolo", titleAnalyzer);
 		perFieldAnalyzers.put("contenuto", contentAnalyzer);
-		
+
 		Analyzer analyzer = new PerFieldAnalyzerWrapper(contentAnalyzer, perFieldAnalyzers);
-		
+
 		/* Text processing semantics for indexing Fields */
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		if (codec != null) {
@@ -129,9 +126,9 @@ public class Homework2 {
 
 		writer.commit();
 		writer.close();
-		
+
 		long timeIndexing2 = System.currentTimeMillis();
-        System.out.println("\nTempo di indicizzazione in ms: " + (timeIndexing2 - timeIndexing1) + "\n");
+		System.out.println("\nTempo di indicizzazione in ms: " + (timeIndexing2 - timeIndexing1) + "\n");
 	}
 
 	@Test
@@ -146,7 +143,7 @@ public class Homework2 {
 			System.out.println("Query:");
 			String parametro = scan.next();
 			QueryParser parser;
-			
+
 			if(campo.equals("contenuto")) {	
 				parser = new QueryParser("contenuto", new StandardAnalyzer());}
 			else {
@@ -159,7 +156,6 @@ public class Homework2 {
 			} finally {
 				directory.close();
 			}
-
 		}
 	}
 
