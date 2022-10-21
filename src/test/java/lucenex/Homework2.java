@@ -39,13 +39,16 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.suggest.analyzing.SuggestStopFilterFactory;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.junit.Before;
+import org.junit.Test;
 
 
 public class Homework2 {
 	private ArrayList<File> queue;
 	private IndexWriter writer;
 	private String docPath;
-	 
+	
+	@Before
 	public void setup() {
 		queue = new ArrayList<File>();
 		docPath = "target/docs";
@@ -71,16 +74,13 @@ public class Homework2 {
 	}
 
 
-
 	private void indexDocs(String fileName, Directory directory, Codec codec) throws IOException {
 		/* Content analyzer */
 		Analyzer contentAnalyzer = CustomAnalyzer.builder()
 				.withTokenizer(WhitespaceTokenizerFactory.class)
 				.addTokenFilter(HyphenatedWordsFilterFactory.class)
-				.addTokenFilter(EnglishPossessiveFilterFactory.class)
 				.addTokenFilter(WordDelimiterGraphFilterFactory.class)
 				.addTokenFilter(LowerCaseFilterFactory.class)
-				.addTokenFilter(EnglishMinimalStemFilterFactory.class)
 				.addTokenFilter(SuggestStopFilterFactory.class)
 				.build();
 
@@ -134,13 +134,14 @@ public class Homework2 {
 		writer.close();
 	}
 
+	@Test
 	public void testQuery() throws Exception {
 		Path path = Paths.get("target/index");
 
 		try (Directory directory = FSDirectory.open(path)) {
 			indexDocs(docPath, directory, null);
 			Scanner scan = new Scanner(System.in);
-			System.out.println("Eseguire la query su titolo o contenuto?\n");
+			System.out.println("Eseguire la query su titolo o contenuto?");
 			String campo = scan.next();
 			System.out.println("Query:");
 			String parametro = scan.next();
@@ -168,7 +169,7 @@ public class Homework2 {
 
 	private void runQuery(IndexSearcher searcher, Query query, boolean explain) throws IOException {
 		TopDocs hits = searcher.search(query, 10);
-		System.out.println("Risultati: ");
+		System.out.println("\nRisultati: ");
 		for (int i = 0; i < hits.scoreDocs.length; i++) {
 			ScoreDoc scoreDoc = hits.scoreDocs[i];
 			Document doc = searcher.doc(scoreDoc.doc);
