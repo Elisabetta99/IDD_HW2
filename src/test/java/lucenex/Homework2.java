@@ -41,7 +41,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 
-public class Homework1 {
+public class Homework2 {
 	private ArrayList<File> queue;
 	private IndexWriter writer;
 	private String docPath;
