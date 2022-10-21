@@ -75,6 +75,8 @@ public class Homework2 {
 
 
 	private void indexDocs(String fileName, Directory directory, Codec codec) throws IOException {
+		long timeIndexing1 = System.currentTimeMillis();
+		
 		/* Content analyzer */
 		Analyzer contentAnalyzer = CustomAnalyzer.builder()
 				.withTokenizer(WhitespaceTokenizerFactory.class)
@@ -84,13 +86,8 @@ public class Homework2 {
 				.addTokenFilter(SuggestStopFilterFactory.class)
 				.build();
 
-		Map<String,String> params=new HashMap<>();
-		params.put("pattern", ".txt");
-		params.put("replacement", " ");
-
 		/* Title analyzer */
 		Analyzer titleAnalyzer = CustomAnalyzer.builder()
-				.addCharFilter(PatternReplaceCharFilterFactory.class, params)
 				.withTokenizer(WhitespaceTokenizerFactory.class)
 				.addTokenFilter(TrimFilterFactory.class)
 				.addTokenFilter(LowerCaseFilterFactory.class)
@@ -132,6 +129,9 @@ public class Homework2 {
 
 		writer.commit();
 		writer.close();
+		
+		long timeIndexing2 = System.currentTimeMillis();
+        System.out.println("\nTempo di indicizzazione in ms: " + (timeIndexing2 - timeIndexing1) + "\n");
 	}
 
 	@Test
